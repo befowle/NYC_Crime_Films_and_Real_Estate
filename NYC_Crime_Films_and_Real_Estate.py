@@ -15,7 +15,7 @@ client = Socrata('data.cityofnewyork.us',
                   username=config.app_user,
                   password=config.app_pw)
 
-# First 2000 results, returned as JSON from API / converted to Python list of
+# First 5000 results, returned as JSON from API / converted to Python list of
 # dictionaries by sodapy.
 property_values_results = client.get("8vgb-zm6e", limit=50000)
 
@@ -51,3 +51,34 @@ permit_results_df = pd.DataFrame.from_records(permit_results)
 
 #save to to_csv
 results_df.to_csv('film_permits.csv')
+
+#Pull film permit results
+film_permit_results = client.get("tg4x-b46p", limit=50000)
+
+# Convert to pandas DataFrame
+film_permit_results_df = pd.DataFrame.from_records(film_permit_results)
+
+#filter to Manhattan permits only
+m_film_permit_results_df = film_permit_results_df[film_permit_results_df.values == 'Manhattan']
+
+#save as csv
+m_film_permit_results_df.to_csv('manhattan_film_permits')
+
+#group by precinct
+permits_per_pct = manhattan_film_permit_results_df.groupby('policeprecinct_s')
+
+#count permits per precinct
+num_permits_per_pct = permits_per_pct.count()
+num_permits_per_pct
+num_permits_per_pct.to_csv('num_permits_per_pct.csv')
+
+#count permits per zipcode
+permits_per_zipcode = manhattan_film_permit_results_df.groupby('zipcode_s')
+permits_per_zip_df = permits_per_zipcode.count()
+permits_per_zip_df.to_csv('permits_per_zip_df.csv')
+
+
+
+
+#merge permits with property values df
+permits_and_property_value = pd.merge(manhattan_film_permit_results_df, )
